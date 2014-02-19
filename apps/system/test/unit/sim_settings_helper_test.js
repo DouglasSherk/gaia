@@ -26,7 +26,7 @@ suite('SimSettingsHelper > ', function() {
   suiteSetup(function(done) {
     SIMSlotManager.mInstances.push(new SIMSlot());
     SIMSlotManager.mInstances.push(new SIMSlot());
-    requireApp('system/js/sim_settings_helper.js', done);
+    requireApp('system/shared/js/sim_settings_helper.js', done);
   });
 
   setup(function() {

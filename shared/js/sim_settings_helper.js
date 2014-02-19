@@ -3,12 +3,21 @@
 'use strict';
 
 (function(exports) {
-
   /*
    * SimSettingsHelper is a helper to provide semantic ways set / get
    * mozSettings. It is used by SimCardManager.
    */
   var SimSettingsHelper = {
+    EMPTY_OPTION_TEXT: '--',
+    EMPTY_OPTION_VALUE: '-2',
+    ALWAYS_ASK_OPTION_VALUE: '-1',
+
+    SETTINGS_KEY_DATA: 'ril.data.defaultServiceId',
+    SETTINGS_KEY_MMS: 'ril.mms.defaultServiceId',
+    SETTINGS_KEY_SMS: 'ril.sms.defaultServiceId',
+    SETTINGS_KEY_TELEPHONY: 'ril.telephony.defaultServiceId',
+    SETTINGS_KEY_VOICEMAIL: 'ril.voicemail.defaultServiceId',
+
     getCardIndexFrom: function(serviceName, callback) {
       // _get(), _onWhichCard() and _getFromSettingsDB() are internal methods
       // and should be used together, so I wrap them inside this method
@@ -20,13 +29,13 @@
       this.settingKeys = [];
       switch (serviceName) {
         case 'outgoingCall':
-          this.settingKeys.push('ril.telephony.defaultServiceId');
+          this.settingKeys.push(this.SETTINGS_KEY_TELEPHONY);
           break;
         case 'outgoingMessages':
-          this.settingKeys.push('ril.sms.defaultServiceId');
+          this.settingKeys.push(this.SETTINGS_KEY_SMS);
           break;
         case 'outgoingData':
-          this.settingKeys.push('ril.data.defaultServiceId');
+          this.settingKeys.push(this.SETTINGS_KEY_DATA);
           break;
       }
       return this;
@@ -63,17 +72,17 @@
 
       switch (serviceName) {
         case 'outgoingCall':
-          this.settingKeys.push('ril.telephony.defaultServiceId');
-          this.settingKeys.push('ril.voicemail.defaultServiceId');
+          this.settingKeys.push(this.SETTINGS_KEY_TELEPHONY);
+          this.settingKeys.push(this.SETTINGS_KEY_VOICEMAIL);
           break;
 
         case 'outgoingMessages':
-          this.settingKeys.push('ril.sms.defaultServiceId');
+          this.settingKeys.push(this.SETTINGS_KEY_SMS);
           break;
 
         case 'outgoingData':
-          this.settingKeys.push('ril.mms.defaultServiceId');
-          this.settingKeys.push('ril.data.defaultServiceId');
+          this.settingKeys.push(this.SETTINGS_KEY_MMS);
+          this.settingKeys.push(this.SETTINGS_KEY_DATA);
           break;
       }
 
