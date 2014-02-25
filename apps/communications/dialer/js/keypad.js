@@ -1,5 +1,6 @@
 /* globals CallHandler, CallLogDBManager, CallsHandler, CallScreen, LazyLoader,
-           PhoneNumberActionMenu, SettingsListener, TonePlayer, Utils */
+           PhoneNumberActionMenu, SettingsListener, SimPicker,
+           SimSettingsHelper, TonePlayer, Utils */
 
 'use strict';
 
@@ -133,8 +134,17 @@ var KeypadManager = {
     // The keypad call bar is only included in the normal version and
     // the emergency call version of the keypad.
     if (this.callBarCallAction) {
-      this.callBarCallAction.addEventListener('click',
-                                              this.makeCall.bind(this));
+      var self = this;
+      var imports = ['/shared/js/sim_picker.js',
+                     '/shared/js/sim_settings_helper.js'];
+      LazyLoader.load(imports,
+        function hk_initSimPicker() {
+          SimPicker.init(self.callBarCallAction,
+                         self.simSelectedCallback.bind(self),
+                         self.makeCall.bind(self),
+                         null,
+                         SimSettingsHelper.SETTINGS_KEY_TELEPHONY);
+      });
     }
 
     // The keypad cancel bar is only the emergency call version of the keypad.
@@ -207,7 +217,7 @@ var KeypadManager = {
     }
   },
 
-  makeCall: function hk_makeCall(event) {
+  makeCall: function hk_makeCall(event, oneTimeConnection) {
     if (event)
       event.stopPropagation();
 
@@ -220,9 +230,15 @@ var KeypadManager = {
           }
         }
       );
+    } else if (oneTimeConnection !== undefined) {
+      CallHandler.call(KeypadManager._phoneNumber, oneTimeConnection);
     } else {
       CallHandler.call(KeypadManager._phoneNumber);
     }
+  },
+
+  simSelectedCallback: function hk_simSelectedCallback(cardIndex) {
+    this.makeCall(null, cardIndex);
   },
 
   addContact: function hk_addContact(event) {

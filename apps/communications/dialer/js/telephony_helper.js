@@ -6,7 +6,7 @@
 var TelephonyHelper = (function() {
   var confirmLoaded = false;
 
-  var call = function t_call(number, oncall, onconnected,
+  var call = function t_call(number, oneTimeConnection, oncall, onconnected,
                              ondisconnected, onerror) {
     var sanitizedNumber = number.replace(/(\s|-|\.|\(|\))/g, '');
     if (!isValid(sanitizedNumber)) {
@@ -14,7 +14,7 @@ var TelephonyHelper = (function() {
       return;
     }
 
-    getConnection(function gotConnection(conn) {
+    getConnection(oneTimeConnection, function gotConnection(conn) {
       if (!conn || !conn.voice) {
         // No voice connection, the call won't make it
         displayMessage('NoNetwork');
@@ -33,14 +33,24 @@ var TelephonyHelper = (function() {
 
       var activeCall = telephony.active;
       if (!activeCall) {
-        startDial(
-          conn, sanitizedNumber, oncall, onconnected, ondisconnected, onerror);
+        startDial(oneTimeConnection,
+                  conn,
+                  sanitizedNumber,
+                  oncall,
+                  onconnected,
+                  ondisconnected,
+                  onerror);
         return;
       }
       activeCall.onheld = function activeCallHeld() {
         activeCall.onheld = null;
-        startDial(
-          conn, sanitizedNumber, oncall, onconnected, ondisconnected, onerror);
+        startDial(oneTimeConnection,
+                  conn,
+                  sanitizedNumber,
+                  oncall,
+                  onconnected,
+                  ondisconnected,
+                  onerror);
       };
       activeCall.hold();
     });
@@ -57,8 +67,13 @@ var TelephonyHelper = (function() {
     TonePlayer.playSequence(sequence);
   }
 
-  function startDial(
-    conn, sanitizedNumber, oncall, onconnected, ondisconnected, onerror) {
+  function startDial(oneTimeConnection,
+                     conn,
+                     sanitizedNumber,
+                     oncall,
+                     onconnected,
+                     ondisconnected,
+                     onerror) {
 
     var telephony = navigator.mozTelephony;
     if (!telephony) {
@@ -90,8 +105,10 @@ var TelephonyHelper = (function() {
         // default service, otherwise we force the first slot.
         var serviceId = hasCard ? undefined : 0;
         promiseOrCall = telephony.dialEmergency(sanitizedNumber, serviceId);
-      } else {
+      } else if (oneTimeConnection === null) {
         promiseOrCall = telephony.dial(sanitizedNumber);
+      } else {
+        promiseOrCall = telephony.dial(sanitizedNumber, oneTimeConnection);
       }
 
       /* XXX: Temporary fix to handle old and new telephony API
@@ -159,7 +176,7 @@ var TelephonyHelper = (function() {
     return validExp.test(sanitizedNumber);
   };
 
-  var getConnection = function t_getConnection(callback) {
+  var getConnection = function t_getConnection(oneTimeConnection, callback) {
     var conn = window.navigator.mozMobileConnection;
     if (conn) {
       callback(conn);
@@ -178,16 +195,22 @@ var TelephonyHelper = (function() {
       return;
     }
 
-    var req = settings.createLock().get('ril.telephony.defaultServiceId');
+    if (oneTimeConnection === undefined) {
+      var req = settings.createLock().get('ril.telephony.defaultServiceId');
 
-    req.onsuccess = function getDefaultServiceId() {
-      var id = req.result['ril.telephony.defaultServiceId'] || 0;
-      callback(connections[id]);
-    };
+      req.onsuccess = function getDefaultServiceId() {
+        var id = req.result['ril.telephony.defaultServiceId'] || 0;
+        callback(connections[id]);
+      };
 
-    req.onerror = function getDefaultServiceIdError() {
-      callback(null);
-    };
+      req.onerror = function getDefaultServiceIdError() {
+        callback(null);
+      };
+    } else {
+      // A specific connection has been requested for one-time use. For example,
+      // a specific SIM was selected to be used for just this call.
+      callback(connections[oneTimeConnection]);
+    }
   };
 
   var loadConfirm = function t_loadConfirm(cb) {
