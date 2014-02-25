@@ -18,7 +18,8 @@
         method: function optionMethod(param1, param2) {
           // Method and params if needed
         },
-        params: ['param1', '123123123']
+        params: ['param1', '123123123'],
+       appendElem: myDOMNode
       },
       ....
       ,
@@ -46,6 +47,9 @@
     // Optional header text or node
     header: ...,
 
+   // Optional header L10n id
+   headerL10nId: ...,
+
     // additional classes on the dialog, as an array of strings
     classes: ...
 
@@ -62,7 +66,6 @@
     complete: function() {...}
   }
 */
-
 
 var OptionMenu = function(options) {
   if (!options || !options.items || options.items.length === 0) {
@@ -127,6 +130,11 @@ var OptionMenu = function(options) {
       return;
     }
     menu.appendChild(button);
+
+    if (item.appendElem) {
+      button.appendChild(item.appendElem);
+    }
+
     // Add a mapping from the button object
     // directly to its options item.
     item.incomplete = item.incomplete || false;
