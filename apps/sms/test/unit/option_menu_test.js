@@ -117,6 +117,19 @@ suite('OptionMenu', function() {
       assert.isNull(menu.form.querySelector('header'));
     });
 
+    test('headerL10nId: text', function() {
+      options.headerL10nId = 'cancel';
+      options.header = null;
+
+      menu = new OptionMenu(options);
+      formHeader = menu.form.firstElementChild;
+
+      sinon.assert.calledWith(navigator.mozL10n.localize, formHeader, 'cancel');
+
+      // Set the options back to how they were so that the rest of the tests
+      // don't fail since they aren't expecting a localized header.
+      options.headerL10nId = null;
+    });
 
     test('section: text', function() {
       assert.equal(
