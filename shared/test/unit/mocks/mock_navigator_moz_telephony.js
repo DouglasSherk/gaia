@@ -2,7 +2,7 @@
 
 (function() {
 
-  var props = ['active', 'calls'];
+  var props = ['active', 'calls', 'conferenceGroup'];
 
   var listeners;
 

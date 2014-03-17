@@ -1,14 +1,16 @@
 /* globals MultiSimActionButton, MockSimPicker, MocksHelper, MockMozL10n,
            MockNavigatorSettings, MockNavigatorMozIccManager,
-           MockSettingsListener, ALWAYS_ASK_OPTION_VALUE
+           MockNavigatorMozTelephony, MockSettingsListener,
+           ALWAYS_ASK_OPTION_VALUE
 */
 
 'use strict';
 
 require('/dialer/test/unit/mock_lazy_loader.js');
 require('/dialer/test/unit/mock_l10n.js');
-require('/shared/test/unit/mocks/mock_navigator_moz_settings.js');
 require('/shared/test/unit/mocks/mock_navigator_moz_icc_manager.js');
+require('/shared/test/unit/mocks/mock_navigator_moz_settings.js');
+require('/shared/test/unit/mocks/mock_navigator_moz_telephony.js');
 require('/shared/test/unit/mocks/mock_sim_picker.js');
 require('/shared/test/unit/mocks/mock_settings_listener.js');
 
@@ -24,6 +26,7 @@ var mocksHelperForMultiSimActionButton = new MocksHelper([
 suite('multi SIM action button', function() {
   var subject;
   var realMozSettings;
+  var realMozTelephony;
   var realMozL10n;
   var realMozIccManager;
   var phoneNumber;
@@ -75,6 +78,9 @@ suite('multi SIM action button', function() {
     realMozSettings = navigator.mozSettings;
     navigator.mozSettings = MockNavigatorSettings;
 
+    realMozTelephony = navigator.mozTelephony;
+    navigator.mozTelephony = MockNavigatorMozTelephony;
+
     realMozL10n = navigator.mozL10n;
     navigator.mozL10n = MockMozL10n;
 
@@ -84,6 +90,7 @@ suite('multi SIM action button', function() {
 
   suiteTeardown(function() {
     navigator.mozSettings = realMozSettings;
+    navigator.mozTelephony = realMozTelephony;
     navigator.mozL10n = realMozL10n;
     navigator.mozIccManager = realMozIccManager;
   });
@@ -93,19 +100,17 @@ suite('multi SIM action button', function() {
     phoneNumber = '';
     button = document.createElement('button');
     initSubject();
+
+    navigator.mozIccManager.addIcc(0, {});
   });
 
   teardown(function() {
     MockNavigatorSettings.mTeardown();
+    MockNavigatorMozTelephony.mTeardown();
     MockNavigatorMozIccManager.mTeardown();
   });
 
   suite('<= 1 SIMs', function() {
-    setup(function() {
-      navigator.mozIccManager.addIcc(0, {});
-      initSubject();
-    });
-
     test('should not show SIM picker menu when long pressing', function() {
       phoneNumber = '15555555555';
       var showSpy = this.sinon.spy(MockSimPicker, 'show');
@@ -115,11 +120,12 @@ suite('multi SIM action button', function() {
   });
 
   suite('>= 2 SIMs', function() {
+    setup(function() {
+      navigator.mozIccManager.addIcc(1, {});
+    });
+
     suite('SIM 2 preferred', function() {
       setup(function() {
-        navigator.mozIccManager.addIcc(0, {});
-        navigator.mozIccManager.addIcc(1, {});
-
         cardIndex = 1;
         initSubject();
       });
@@ -183,6 +189,70 @@ suite('multi SIM action button', function() {
         simulateClick();
         MockNavigatorSettings.mReplyToRequests();
         sinon.assert.calledWith(showSpy, cardIndex, phoneNumber);
+      });
+    });
+
+    suite('active call', function() {
+      var mockCall = { serviceId: 1 };
+
+      var shouldNotOpenSimPicker = function() {
+        var showSpy = this.sinon.spy(MockSimPicker, 'show');
+        simulateClick();
+        simulateContextMenu();
+        MockNavigatorSettings.mReplyToRequests();
+        sinon.assert.notCalled(showSpy);
+      };
+
+      var shouldReturnCurrentServiceId = function() {
+        var callStub = this.sinon.stub();
+
+        subject = new MultiSimActionButton(
+          button,
+          callStub,
+          'ril.telephony.defaultServiceId',
+          phoneNumberGetter
+        );
+        MockSettingsListener.mTriggerCallback(
+          'ril.telephony.defaultServiceId', cardIndex);
+
+        phoneNumber = '0123456789';
+        simulateClick();
+
+        sinon.assert.calledWith(callStub, phoneNumber, mockCall.serviceId);
+      };
+
+      setup(function() {
+        cardIndex = 0;
+        MockNavigatorSettings.createLock().set({
+          'ril.telephony.defaultServiceId': cardIndex });
+
+        initSubject();
+      });
+
+      suite('standard call(s)', function() {
+        setup(function() {
+          // Use a serviceId for the call != default cardIndex
+          MockNavigatorMozTelephony.calls = [mockCall];
+        });
+
+        test('should not open SIM picker on (long) tap',
+             shouldNotOpenSimPicker);
+
+        test('should return current serviceId of call',
+             shouldReturnCurrentServiceId);
+      });
+
+      suite('conference call', function() {
+        setup(function() {
+          MockNavigatorMozTelephony.conferenceGroup =
+            { calls: [mockCall, mockCall] };
+        });
+
+        test('should not open SIM picker on (long) tap',
+             shouldNotOpenSimPicker);
+
+        test('should return current serviceId of call',
+             shouldReturnCurrentServiceId);
       });
     });
   });

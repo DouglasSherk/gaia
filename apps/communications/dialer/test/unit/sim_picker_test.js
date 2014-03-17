@@ -1,10 +1,12 @@
-/* globals SimPicker, MocksHelper, MockMozL10n, MockNavigatorMozIccManager */
+/* globals SimPicker, MocksHelper, MockMozL10n, MockNavigatorMozIccManager,
+           MockNavigatorMozTelephony */
 
 'use strict';
 
 require('/dialer/test/unit/mock_lazy_loader.js');
 require('/dialer/test/unit/mock_l10n.js');
 require('/shared/test/unit/mocks/mock_navigator_moz_icc_manager.js');
+require('/shared/test/unit/mocks/mock_navigator_moz_telephony.js');
 
 require('/shared/js/sim_picker.js');
 
@@ -17,6 +19,7 @@ suite('SIM picker', function() {
   var subject;
   var realMozIccManager;
   var realMozL10n;
+  var realMozTelephony;
   var menu;
   var header;
 
@@ -40,12 +43,16 @@ suite('SIM picker', function() {
     navigator.mozL10n = MockMozL10n;
     navigator.mozL10n.localize = function() {};
 
+    realMozTelephony = navigator.mozTelephony;
+    navigator.mozTelephony = MockNavigatorMozTelephony;
+
     menu = document.querySelector('menu');
   });
 
   suiteTeardown(function() {
     navigator.mozIccManager = realMozIccManager;
     navigator.mozL10n = realMozL10n;
+    navigator.mozTelephony = realMozTelephony;
   });
 
   setup(function() {
@@ -168,6 +175,35 @@ suite('SIM picker', function() {
 
       sinon.assert.notCalled(callbackStub);
       assert.equal(document.getElementById('sim-picker').hidden, true);
+    });
+  });
+
+  suite('active call(s)', function() {
+    var shouldReturnActiveServiceId = function() {
+      var callbackStub = this.sinon.stub();
+      subject.show(0, '1111', callbackStub);
+      sinon.assert.calledWith(callbackStub, 1);
+    };
+
+    teardown(function() {
+      MockNavigatorMozTelephony.mTeardown();
+    });
+
+    suite('standard call', function() {
+      setup(function() {
+        MockNavigatorMozTelephony.calls = [{ serviceId: 1 }];
+      });
+
+      test('should return active call serviceId', shouldReturnActiveServiceId);
+    });
+
+    suite('conference call', function() {
+      setup(function() {
+        MockNavigatorMozTelephony.conferenceGroup =
+          { calls: [{ serviceId: 1 }, { serviceId: 1 }] };
+      });
+
+      test('should return active call serviceId', shouldReturnActiveServiceId);
     });
   });
 });

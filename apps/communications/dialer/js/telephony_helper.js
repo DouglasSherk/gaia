@@ -25,6 +25,17 @@ var TelephonyHelper = (function() {
     }
 
     var telephony = navigator.mozTelephony;
+    var isInCall = !!telephony.calls.length;
+    var isInConference = !!telephony.conferenceGroup.calls.length;
+    if ((isInCall &&
+        ('' + telephony.calls[0].serviceId) !== ('' + cardIndex)) ||
+        (isInConference &&
+        ('' + telephony.conferenceGroup.calls[0].serviceId) !==
+          ('' + cardIndex))) {
+      displayMessage('OtherConnectionInUse');
+      return;
+    }
+
     var openLines = telephony.calls.length +
         (telephony.conferenceGroup.calls.length ? 1 : 0);
     // User can make call only when there are less than 2 calls by spec.
@@ -149,6 +160,8 @@ var TelephonyHelper = (function() {
     } else if (errorName === 'FDNBlockedError' ||
                errorName === 'FdnCheckFailure') {
       displayMessage('FixedDialingNumbers');
+    } else if (errorName == 'OtherConnectionInUse') {
+      displayMessage('OtherConnectionInUse');
     } else {
       // If the call failed for some other reason we should still
       // display something to the user. See bug 846403.
@@ -208,6 +221,10 @@ var TelephonyHelper = (function() {
       case 'FixedDialingNumbers':
         dialogTitle = 'fdnIsEnabledTitle';
         dialogBody = 'fdnIsEnabledMessage';
+        break;
+      case 'OtherConnectionInUse':
+        dialogTitle = 'otherConnectionInUseTitle';
+        dialogBody = 'otherConnectionInUseMessage';
         break;
       default:
         console.error('Invalid message argument'); // Should never happen
