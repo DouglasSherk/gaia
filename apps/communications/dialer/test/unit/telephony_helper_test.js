@@ -169,7 +169,7 @@ suite('telephony helper', function() {
     var dialNumber = '123456';
     var holdStub = this.sinon.stub();
     MockMozTelephony.conferenceGroup.calls =
-                        [{number: '111111'}, {number: '222222'}];
+      [{number: '111111', serviceId: 0}, {number: '222222', serviceId: 0}];
     MockMozTelephony.conferenceGroup.state = 'connected';
     MockMozTelephony.conferenceGroup.hold = holdStub;
     MockMozTelephony.active = MockMozTelephony.conferenceGroup;
@@ -185,7 +185,8 @@ suite('telephony helper', function() {
   });
 
   test('should not dial when call limit reached (2 normal call)', function() {
-    MockMozTelephony.calls = [{number: '111111'}, {number: '222222'}];
+    MockMozTelephony.calls =
+      [{number: '111111', serviceId: 0}, {number: '222222', serviceId: 0}];
     subject.call('333333', 0);
     assert.isTrue(spyConfirmShow.calledWith('unableToCallTitle',
                                             'unableToCallMessage'));
@@ -193,9 +194,9 @@ suite('telephony helper', function() {
 
   test('should not dial when call limit reached (1 normal call + 1 group call)',
   function() {
-    MockMozTelephony.calls = [{number: '111111'}];
+    MockMozTelephony.calls = [{number: '111111', serviceId: 0}];
     MockMozTelephony.conferenceGroup.calls =
-                            [{number: '222222'}, {number: '333333'}];
+      [{number: '222222', serviceId: 0}, {number: '333333', serviceId: 0}];
     subject.call('444444', 0);
     assert.isTrue(spyConfirmShow.calledWith('unableToCallTitle',
                                             'unableToCallMessage'));
@@ -214,6 +215,23 @@ suite('telephony helper', function() {
     subject.call(dialNumber, 0);
     assert.isTrue(spyConfirmShow.calledWith('invalidNumberToDialTitle',
                                             'invalidNumberToDialMessage'));
+  });
+
+  test('should fail if calling on inactive SIM - standard call',
+  function() {
+    MockMozTelephony.calls = [{number: '111111', serviceId: 0}];
+    subject.call('222222', 1);
+    assert.isTrue(spyConfirmShow.calledWith('otherConnectionInUseTitle',
+                                            'otherConnectionInUseMessage'));
+  });
+
+  test('should fail if calling on inactive SIM - conference call',
+  function() {
+    MockMozTelephony.conferenceGroup.calls =
+      [{number: '222222', serviceId: 0}, {number: '333333', serviceId: 0}];
+    subject.call('222222', 1);
+    assert.isTrue(spyConfirmShow.calledWith('otherConnectionInUseTitle',
+                                            'otherConnectionInUseMessage'));
   });
 
   suite('Callbacks binding', function() {
@@ -362,6 +380,13 @@ suite('telephony helper', function() {
       mockCall.onerror(createCallError('RadioNotAvailable'));
       assert.isTrue(spyConfirmShow.calledWith('callAirplaneModeTitle',
                                               'callAirplaneModeMessage'));
+    });
+
+    test('should handle OtherConnectionInUse', function() {
+      subject.call('123', 0);
+      mockCall.onerror(createCallError('OtherConnectionInUse'));
+      assert.isTrue(spyConfirmShow.calledWith('otherConnectionInUseTitle',
+                                              'otherConnectionInUseMessage'));
     });
   });
 

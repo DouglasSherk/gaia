@@ -15,8 +15,8 @@ var MultiSimActionButton = function MultiSimActionButton(
 
   this._button.addEventListener('click', this._click.bind(this));
 
-  if (window.navigator.mozIccManager &&
-      window.navigator.mozIccManager.iccIds.length > 1) {
+  if (navigator.mozIccManager &&
+      navigator.mozIccManager.iccIds.length > 1) {
     this._button.addEventListener('contextmenu', this._contextmenu.bind(this));
 
     var self = this;
@@ -29,6 +29,22 @@ var MultiSimActionButton = function MultiSimActionButton(
 
 MultiSimActionButton.prototype._getCardIndex =
   function cb_getCardIndex(callback) {
+  var telephony = navigator.mozTelephony;
+  if (telephony) {
+    var isInCall = !!(telephony.calls && telephony.calls.length);
+    var isInConference = !!(telephony.conferenceGroup &&
+                            telephony.conferenceGroup.calls &&
+                            telephony.conferenceGroup.calls.length);
+
+    if (isInCall || isInConference) {
+      var serviceId = isInCall ?
+        telephony.calls[0].serviceId :
+        telephony.conferenceGroup.calls[0].serviceId;
+      callback(serviceId);
+      return;
+    }
+  }
+
   var settingsKey = this._settingsKey;
   var settings = navigator.mozSettings;
   var getReq = settings.createLock().get(settingsKey);
@@ -47,11 +63,11 @@ MultiSimActionButton.prototype._click = function cb_click(event) {
   }
 
   var phoneNumber = this._phoneNumberGetter && this._phoneNumberGetter();
-  if (!window.navigator.mozIccManager || phoneNumber === '') {
+  if (!navigator.mozIccManager || phoneNumber === '') {
     return;
   }
 
-  if (window.navigator.mozIccManager.iccIds.length === 1) {
+  if (navigator.mozIccManager.iccIds.length === 1) {
     this.performAction();
     return;
   }
@@ -65,15 +81,15 @@ MultiSimActionButton.prototype._click = function cb_click(event) {
         SimPicker.show(cardIndex, phoneNumber, self.performAction.bind(self));
       });
     } else {
-      self.performAction();
+      self.performAction(cardIndex);
     }
   });
 };
 
 MultiSimActionButton.prototype._updateUI = function cb_updateUI(cardIndex) {
   if (cardIndex >= 0 &&
-      window.navigator.mozIccManager &&
-      window.navigator.mozIccManager.iccIds.length > 1) {
+      navigator.mozIccManager &&
+      navigator.mozIccManager.iccIds.length > 1) {
     if (this._simIndication) {
       var self = this;
       navigator.mozL10n.ready(function() {
@@ -93,10 +109,22 @@ MultiSimActionButton.prototype._contextmenu = function cb_contextmenu(event) {
   // number is blank. We don't want to preventDefault because we want the
   // contextmenu event to generate a click.
   var phoneNumber = this._phoneNumberGetter && this._phoneNumberGetter();
-  if (!window.navigator.mozIccManager ||
-      window.navigator.mozIccManager.iccIds.length === 0 ||
+  if (!navigator.mozIccManager ||
+      navigator.mozIccManager.iccIds.length === 0 ||
       phoneNumber === '' ||
       event.target.disabled) {
+    return;
+  }
+
+  // If telephony is currently active (for example, in a call), we must use that
+  // SIM for any actions, so we shouldn't show any facing options which allow
+  // them to pick a different one.
+  var telephony = navigator.mozTelephony;
+  if (telephony &&
+      ((telephony.calls && telephony.calls.length) ||
+       (telephony.conferenceGroup &&
+        telephony.conferenceGroup.calls &&
+        telephony.conferenceGroup.calls.length))) {
     return;
   }
 

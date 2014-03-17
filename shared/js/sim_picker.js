@@ -12,6 +12,22 @@
     _simPickerElt: null,
 
     show: function hk_show(defaultCardIndex, phoneNumber, simSelectedCallback) {
+      var telephony = navigator.mozTelephony;
+      if (telephony) {
+        var isInCall = !!(telephony.calls && telephony.calls.length);
+        var isInConference = !!(telephony.conferenceGroup &&
+                                telephony.conferenceGroup.calls &&
+                                telephony.conferenceGroup.calls.length);
+
+        if (isInCall || isInConference) {
+          var serviceId = isInCall ?
+            navigator.mozTelephony.calls[0].serviceId :
+            navigator.mozTelephony.conferenceGroup.calls[0].serviceId;
+          simSelectedCallback(serviceId);
+          return;
+        }
+      }
+
       this._simSelectedCallback = simSelectedCallback;
       this._simPickerElt = document.getElementById('sim-picker');
 
