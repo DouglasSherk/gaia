@@ -29,32 +29,25 @@ var MultiSimActionButton = function MultiSimActionButton(
 
 MultiSimActionButton.prototype._getCardIndex =
   function cb_getCardIndex(callback) {
-  var telephony = navigator.mozTelephony;
-  if (telephony) {
-    var isInCall = !!(telephony.calls && telephony.calls.length);
-    var isInConference = !!(telephony.conferenceGroup &&
-                            telephony.conferenceGroup.calls &&
-                            telephony.conferenceGroup.calls.length);
-
-    if (isInCall || isInConference) {
-      var serviceId = isInCall ?
-        telephony.calls[0].serviceId :
-        telephony.conferenceGroup.calls[0].serviceId;
-      callback(serviceId);
+  var self = this;
+  LazyLoader.load(['/shared/js/sim_picker.js'], function() {
+    var inUseSim = SimPicker.getInUseSim();
+    if (inUseSim !== null) {
+      callback(inUseSim);
       return;
     }
-  }
 
-  var settingsKey = this._settingsKey;
-  var settings = navigator.mozSettings;
-  var getReq = settings.createLock().get(settingsKey);
-  var done = function done() {
-    callback(getReq.result[settingsKey]);
-  };
-  getReq.onsuccess = done;
-  getReq.onerror = function() {
-    console.error('Failed to retrieve ', settingsKey);
-  };
+    var settingsKey = self._settingsKey;
+    var settings = navigator.mozSettings;
+    var getReq = settings.createLock().get(settingsKey);
+    var done = function done() {
+      callback(getReq.result[settingsKey]);
+    };
+    getReq.onsuccess = done;
+    getReq.onerror = function() {
+      console.error('Failed to retrieve ', settingsKey);
+    };
+  });
 };
 
 MultiSimActionButton.prototype._click = function cb_click(event) {
@@ -78,7 +71,8 @@ MultiSimActionButton.prototype._click = function cb_click(event) {
     // so we prompt them to pick a SIM even when they only click.
     if (cardIndex == ALWAYS_ASK_OPTION_VALUE) {
       LazyLoader.load(['/shared/js/sim_picker.js'], function() {
-        SimPicker.show(cardIndex, phoneNumber, self.performAction.bind(self));
+        SimPicker.getOrPick(cardIndex, phoneNumber,
+                            self.performAction.bind(self));
       });
     } else {
       self.performAction(cardIndex);
@@ -135,7 +129,8 @@ MultiSimActionButton.prototype._contextmenu = function cb_contextmenu(event) {
   var self = this;
   self._getCardIndex(function(cardIndex) {
     LazyLoader.load(['/shared/js/sim_picker.js'], function() {
-      SimPicker.show(cardIndex, phoneNumber, self.performAction.bind(self));
+      SimPicker.getOrPick(cardIndex, phoneNumber,
+                          self.performAction.bind(self));
     });
   });
 };

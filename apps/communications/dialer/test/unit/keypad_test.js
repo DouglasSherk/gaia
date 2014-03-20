@@ -367,7 +367,7 @@ suite('dialer/keypad', function() {
           fakeVoicemail2];
           MockNavigatorSettings.mSettings['ril.voicemail.defaultServiceId'] = 1;
 
-          this.sinon.spy(SimPicker, 'show');
+          this.sinon.spy(SimPicker, 'getOrPick');
           subject._touchStart('1', true);
           this.sinon.clock.tick(1500);
           subject._touchEnd('1');
@@ -376,17 +376,17 @@ suite('dialer/keypad', function() {
         });
 
         test('should show the SIM picker for favorite SIM', function() {
-          sinon.assert.calledWith(SimPicker.show, 1, 'voiceMail');
+          sinon.assert.calledWith(SimPicker.getOrPick, 1, 'voiceMail');
         });
 
         test('should call voicemail for SIM1', function() {
-          SimPicker.show.yield(0);
+          SimPicker.getOrPick.yield(0);
           MockNavigatorSettings.mReplyToRequests();
           sinon.assert.calledWith(CallHandler.call, fakeVoicemail1, 0);
         });
 
         test('should call voicemail for SIM2', function() {
-          SimPicker.show.yield(1);
+          SimPicker.getOrPick.yield(1);
           MockNavigatorSettings.mReplyToRequests();
           sinon.assert.calledWith(CallHandler.call, fakeVoicemail2, 1);
         });
