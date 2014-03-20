@@ -120,10 +120,6 @@ suite('SIM picker', function() {
 
       subject.getOrPick(0, '1111', function() {});
     });
-
-    test('getInUseSim with no call in progress should return null', function() {
-      assert.equal(subject.getInUseSim(), null);
-    });
   });
 
   suite('buttons', function() {
@@ -189,10 +185,6 @@ suite('SIM picker', function() {
       sinon.assert.calledWith(callbackStub, 1);
     };
 
-    var shouldReturnInUseServiceId = function() {
-      assert.equal(subject.getInUseSim(), 1);
-    };
-
     teardown(function() {
       MockNavigatorMozTelephony.mTeardown();
     });
@@ -204,7 +196,6 @@ suite('SIM picker', function() {
 
       test('should callback with in use serviceId',
            shouldCallbackWithInUseServiceId);
-      test('should return in use serviceId', shouldReturnInUseServiceId);
     });
 
     suite('conference call', function() {
@@ -215,7 +206,6 @@ suite('SIM picker', function() {
 
       test('should callback with in use serviceId',
            shouldCallbackWithInUseServiceId);
-      test('should return in use serviceId', shouldReturnInUseServiceId);
     });
   });
 });

@@ -26,7 +26,8 @@ var TelephonyHelper = (function() {
 
     var telephony = navigator.mozTelephony;
     var openLines = telephony.calls.length +
-        (telephony.conferenceGroup.calls.length ? 1 : 0);
+        ((telephony.conferenceGroup &&
+          telephony.conferenceGroup.calls.length) ? 1 : 0);
     // User can make call only when there are less than 2 calls by spec.
     // If the limit reached, return early to prevent holding active call.
     if (openLines >= 2) {
@@ -243,8 +244,29 @@ var TelephonyHelper = (function() {
     }
   };
 
+  var getInUseSim = function t_getInUseSim() {
+    var telephony = navigator.mozTelephony;
+    if (telephony) {
+      var isInCall = !!(telephony.calls && telephony.calls.length);
+      var isInConference = !!(telephony.conferenceGroup &&
+                              telephony.conferenceGroup.calls &&
+                              telephony.conferenceGroup.calls.length);
+
+      if (isInCall || isInConference) {
+        return isInCall ?
+          navigator.mozTelephony.calls[0].serviceId :
+          navigator.mozTelephony.conferenceGroup.calls[0].serviceId;
+      }
+    }
+
+    return null;
+  };
+
+  window.TelephonyHelper = TelephonyHelper;
+
   return {
-    call: call
+    call: call,
+    getInUseSim: getInUseSim
   };
 
 })();

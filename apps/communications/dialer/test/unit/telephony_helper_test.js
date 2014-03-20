@@ -202,6 +202,21 @@ suite('telephony helper', function() {
                                             'unableToCallMessage'));
   });
 
+  test('should return null serviceId - no call', function() {
+    assert.equal(subject.getInUseSim(), null);
+  });
+
+  test('should return call serviceId - call', function() {
+    MockMozTelephony.calls = [{number: '111111', serviceId: 0}];
+    assert.equal(subject.getInUseSim(), 0);
+  });
+
+  test('should return call serviceId - conference call', function() {
+    MockMozTelephony.conferenceGroup.calls =
+      [{number: '222222', serviceId: 0}, {number: '333333', serviceId: 0}];
+    assert.equal(subject.getInUseSim(), 0);
+  });
+
   test('should display an error if there is no network', function() {
     var dialNumber = '01 45 34 55 20';
     MockMozMobileConnection.voice = null;
@@ -445,15 +460,6 @@ suite('telephony helper', function() {
                                        'emergencyDialogBodyDeviceNotAccepted'));
         }).then(done, done);
       });
-
-      test('should handle OtherConnectionInUse', function(done) {
-        subject.call('123', 0);
-        mockPromise.then(function() {
-          mockCall.onerror(createCallError('OtherConnectionInUse'));
-          assert.isTrue(spyConfirmShow.calledWith('otherConnectionInUseTitle',
-                                       'otherConnectionInUseMessage'));
-        }).then(done, done);
-      });
     });
 
     suite('promise errors', function() {
@@ -495,6 +501,15 @@ suite('telephony helper', function() {
         mockPromise.catch(function() {
           sinon.assert.calledWith(spyConfirmShow, 'callAirplaneModeTitle',
                                                   'callAirplaneModeMessage');
+        }).then(done, done);
+      });
+
+      test('should handle OtherConnectionInUse', function(done) {
+        mockPromise = Promise.reject('OtherConnectionInUse');
+        subject.call('123', 0);
+        mockPromise.catch(function() {
+          sinon.assert.calledWith(spyConfirmShow, 'otherConnectionInUseTitle',
+                                                 'otherConnectionInUseMessage');
         }).then(done, done);
       });
 

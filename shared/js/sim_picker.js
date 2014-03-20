@@ -13,34 +13,18 @@
     _domBuilt: false,
     _simPickerElt: null,
 
-    getInUseSim: function hk_getInUseSim() {
-      var telephony = navigator.mozTelephony;
-      if (telephony) {
-        var isInCall = !!(telephony.calls && telephony.calls.length);
-        var isInConference = !!(telephony.conferenceGroup &&
-                                telephony.conferenceGroup.calls &&
-                                telephony.conferenceGroup.calls.length);
-
-        if (isInCall || isInConference) {
-          return isInCall ?
-            navigator.mozTelephony.calls[0].serviceId :
-            navigator.mozTelephony.conferenceGroup.calls[0].serviceId;
-        }
-      }
-
-      return null;
-    },
-
     getOrPick: function hk_getOrPick(defaultCardIndex,
                                      phoneNumber,
                                      simSelectedCallback) {
       this._simSelectedCallback = simSelectedCallback;
       this._simPickerElt = document.getElementById('sim-picker');
 
-      var inUseSim = this.getInUseSim();
-      if (inUseSim !== null) {
-        simSelectedCallback(inUseSim);
-        return;
+      if (window.TelephonyHelper) {
+        var inUseSim = window.TelephonyHelper.getInUseSim();
+        if (inUseSim !== null) {
+          simSelectedCallback(inUseSim);
+          return;
+        }
       }
 
       this._buildDom();

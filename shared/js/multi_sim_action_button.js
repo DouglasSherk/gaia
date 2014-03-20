@@ -29,25 +29,24 @@ var MultiSimActionButton = function MultiSimActionButton(
 
 MultiSimActionButton.prototype._getCardIndex =
   function cb_getCardIndex(callback) {
-  var self = this;
-  LazyLoader.load(['/shared/js/sim_picker.js'], function() {
-    var inUseSim = SimPicker.getInUseSim();
+  if (window.TelephonyHelper) {
+    var inUseSim = window.TelephonyHelper.getInUseSim();
     if (inUseSim !== null) {
       callback(inUseSim);
       return;
     }
+  }
 
-    var settingsKey = self._settingsKey;
-    var settings = navigator.mozSettings;
-    var getReq = settings.createLock().get(settingsKey);
-    var done = function done() {
-      callback(getReq.result[settingsKey]);
-    };
-    getReq.onsuccess = done;
-    getReq.onerror = function() {
-      console.error('Failed to retrieve ', settingsKey);
-    };
-  });
+  var settingsKey = this._settingsKey;
+  var settings = navigator.mozSettings;
+  var getReq = settings.createLock().get(settingsKey);
+  var done = function done() {
+    callback(getReq.result[settingsKey]);
+  };
+  getReq.onsuccess = done;
+  getReq.onerror = function() {
+    console.error('Failed to retrieve ', settingsKey);
+  };
 };
 
 MultiSimActionButton.prototype._click = function cb_click(event) {
@@ -106,19 +105,9 @@ MultiSimActionButton.prototype._contextmenu = function cb_contextmenu(event) {
   if (!navigator.mozIccManager ||
       navigator.mozIccManager.iccIds.length === 0 ||
       phoneNumber === '' ||
-      event.target.disabled) {
-    return;
-  }
-
-  // If telephony is currently active (for example, in a call), we must use that
-  // SIM for any actions, so we shouldn't show any facing options which allow
-  // them to pick a different one.
-  var telephony = navigator.mozTelephony;
-  if (telephony &&
-      ((telephony.calls && telephony.calls.length) ||
-       (telephony.conferenceGroup &&
-        telephony.conferenceGroup.calls &&
-        telephony.conferenceGroup.calls.length))) {
+      event.target.disabled ||
+      (window.TelephonyHelper &&
+       window.TelephonyHelper.getInUseSim() !== null)) {
     return;
   }
 

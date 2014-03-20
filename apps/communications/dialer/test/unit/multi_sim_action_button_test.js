@@ -1,6 +1,6 @@
 /* globals MultiSimActionButton, MockSimPicker, MocksHelper, MockMozL10n,
            MockNavigatorSettings, MockNavigatorMozIccManager,
-           MockNavigatorMozTelephony, MockSettingsListener,
+           MockNavigatorMozTelephony, MockSettingsListener, MockTelephonyHelper,
            ALWAYS_ASK_OPTION_VALUE
 */
 
@@ -8,6 +8,7 @@
 
 require('/dialer/test/unit/mock_lazy_loader.js');
 require('/dialer/test/unit/mock_l10n.js');
+require('/dialer/test/unit/mock_telephony_helper.js');
 require('/shared/test/unit/mocks/mock_navigator_moz_icc_manager.js');
 require('/shared/test/unit/mocks/mock_navigator_moz_settings.js');
 require('/shared/test/unit/mocks/mock_navigator_moz_telephony.js');
@@ -20,7 +21,8 @@ var mocksHelperForMultiSimActionButton = new MocksHelper([
   'LazyL10n',
   'LazyLoader',
   'SimPicker',
-  'SettingsListener'
+  'SettingsListener',
+  'TelephonyHelper'
 ]).init();
 
 suite('multi SIM action button', function() {
@@ -198,13 +200,13 @@ suite('multi SIM action button', function() {
         MockNavigatorSettings.createLock().set({
           'ril.telephony.defaultServiceId': cardIndex });
 
-        MockSimPicker.mInUseSim = 1;
+        MockTelephonyHelper.mInUseSim = 1;
 
         initSubject();
       });
 
       teardown(function() {
-        MockSimPicker.mTeardown();
+        MockTelephonyHelper.mTeardown();
       });
 
       test('should not open SIM picker on (long) tap', function() {
@@ -230,7 +232,8 @@ suite('multi SIM action button', function() {
         phoneNumber = '0123456789';
         simulateClick();
 
-        sinon.assert.calledWith(callStub, phoneNumber, MockSimPicker.mInUseSim);
+        sinon.assert.calledWith(callStub, phoneNumber,
+                                MockTelephonyHelper.mInUseSim);
       });
     });
   });
