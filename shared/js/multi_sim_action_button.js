@@ -22,8 +22,16 @@ var MultiSimActionButton = function MultiSimActionButton(
     var self = this;
     LazyLoader.load(['/shared/js/settings_listener.js'], function() {
       self._simIndication = self._button.querySelector('.js-sim-indication');
+
       SettingsListener.observe(settingsKey, 0,
                                self._settingsObserver.bind(self));
+
+      var telephony = navigator.mozTelephony;
+      if (telephony) {
+        telephony.oncallschanged = self._onCallsChanged.bind(self);
+        telephony.conferenceGroup.oncallschanged =
+          self._onCallsChanged.bind(self);
+      }
     });
   }
 };
@@ -77,6 +85,17 @@ MultiSimActionButton.prototype._settingsObserver =
   this._defaultCardIndex = cardIndex;
   this._updateUI(cardIndex);
 };
+
+MultiSimActionButton.prototype._onCallsChanged =
+  function cb_onCallsChanged(event) {
+  var self = this;
+  LazyLoader.load(['/shared/js/sim_picker.js'], function() {
+    var inUseSim = SimPicker.getInUseSim();
+    if (inUseSim !== null) {
+      self._updateUI(inUseSim);
+    }
+  });
+}
 
 MultiSimActionButton.prototype._updateUI = function cb_updateUI(cardIndex) {
   if (cardIndex >= 0 &&
