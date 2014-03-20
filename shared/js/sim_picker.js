@@ -3,15 +3,17 @@
 'use strict';
 
 (function(exports) {
-  /*
-   * SimPicker is a helper to dynamically generate menus for selecting SIM
-   * cards when making calls, sending SMS, etc.
+  /**
+   * SimPicker is a helper for dynamically generating menus for selecting SIM
+   * cards when making calls, sending SMS, etc. It also returns any currently
+   * in-use SIMs if there is an active call, but only when an app has
+   * mozTelephony permissions.
    */
   var SimPicker = {
     _domBuilt: false,
     _simPickerElt: null,
 
-    show: function hk_show(defaultCardIndex, phoneNumber, simSelectedCallback) {
+    getInUseSim: function hk_getInUseSim() {
       var telephony = navigator.mozTelephony;
       if (telephony) {
         var isInCall = !!(telephony.calls && telephony.calls.length);
@@ -20,16 +22,26 @@
                                 telephony.conferenceGroup.calls.length);
 
         if (isInCall || isInConference) {
-          var serviceId = isInCall ?
+          return isInCall ?
             navigator.mozTelephony.calls[0].serviceId :
             navigator.mozTelephony.conferenceGroup.calls[0].serviceId;
-          simSelectedCallback(serviceId);
-          return;
         }
       }
 
+      return null;
+    },
+
+    getOrPick: function hk_getOrPick(defaultCardIndex,
+                                     phoneNumber,
+                                     simSelectedCallback) {
       this._simSelectedCallback = simSelectedCallback;
       this._simPickerElt = document.getElementById('sim-picker');
+
+      var inUseSim = this.getInUseSim();
+      if (inUseSim !== null) {
+        simSelectedCallback(inUseSim);
+        return;
+      }
 
       this._buildDom();
       var self = this;

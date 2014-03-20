@@ -25,17 +25,6 @@ var TelephonyHelper = (function() {
     }
 
     var telephony = navigator.mozTelephony;
-    var isInCall = !!telephony.calls.length;
-    var isInConference = !!telephony.conferenceGroup.calls.length;
-    if ((isInCall &&
-        ('' + telephony.calls[0].serviceId) !== ('' + cardIndex)) ||
-        (isInConference &&
-        ('' + telephony.conferenceGroup.calls[0].serviceId) !==
-          ('' + cardIndex))) {
-      displayMessage('OtherConnectionInUse');
-      return;
-    }
-
     var openLines = telephony.calls.length +
         (telephony.conferenceGroup.calls.length ? 1 : 0);
     // User can make call only when there are less than 2 calls by spec.

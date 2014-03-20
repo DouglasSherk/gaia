@@ -217,23 +217,6 @@ suite('telephony helper', function() {
                                             'invalidNumberToDialMessage'));
   });
 
-  test('should fail if calling on inactive SIM - standard call',
-  function() {
-    MockMozTelephony.calls = [{number: '111111', serviceId: 0}];
-    subject.call('222222', 1);
-    assert.isTrue(spyConfirmShow.calledWith('otherConnectionInUseTitle',
-                                            'otherConnectionInUseMessage'));
-  });
-
-  test('should fail if calling on inactive SIM - conference call',
-  function() {
-    MockMozTelephony.conferenceGroup.calls =
-      [{number: '222222', serviceId: 0}, {number: '333333', serviceId: 0}];
-    subject.call('222222', 1);
-    assert.isTrue(spyConfirmShow.calledWith('otherConnectionInUseTitle',
-                                            'otherConnectionInUseMessage'));
-  });
-
   suite('Callbacks binding', function() {
     var mockCall;
 
@@ -381,13 +364,6 @@ suite('telephony helper', function() {
       assert.isTrue(spyConfirmShow.calledWith('callAirplaneModeTitle',
                                               'callAirplaneModeMessage'));
     });
-
-    test('should handle OtherConnectionInUse', function() {
-      subject.call('123', 0);
-      mockCall.onerror(createCallError('OtherConnectionInUse'));
-      assert.isTrue(spyConfirmShow.calledWith('otherConnectionInUseTitle',
-                                              'otherConnectionInUseMessage'));
-    });
   });
 
   suite('Call error handling, promise edition', function() {
@@ -470,6 +446,14 @@ suite('telephony helper', function() {
         }).then(done, done);
       });
 
+      test('should handle OtherConnectionInUse', function(done) {
+        subject.call('123', 0);
+        mockPromise.then(function() {
+          mockCall.onerror(createCallError('OtherConnectionInUse'));
+          assert.isTrue(spyConfirmShow.calledWith('otherConnectionInUseTitle',
+                                       'otherConnectionInUseMessage'));
+        }).then(done, done);
+      });
     });
 
     suite('promise errors', function() {
