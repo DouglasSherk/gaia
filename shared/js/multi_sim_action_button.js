@@ -22,7 +22,8 @@ var MultiSimActionButton = function MultiSimActionButton(
     var self = this;
     LazyLoader.load(['/shared/js/settings_listener.js'], function() {
       self._simIndication = self._button.querySelector('.js-sim-indication');
-      SettingsListener.observe(settingsKey, 0, self._updateUI.bind(self));
+      SettingsListener.observe(settingsKey, 0,
+                               self._settingsObserver.bind(self));
     });
   }
 };
@@ -37,16 +38,7 @@ MultiSimActionButton.prototype._getCardIndex =
       return;
     }
 
-    var settingsKey = self._settingsKey;
-    var settings = navigator.mozSettings;
-    var getReq = settings.createLock().get(settingsKey);
-    var done = function done() {
-      callback(getReq.result[settingsKey]);
-    };
-    getReq.onsuccess = done;
-    getReq.onerror = function() {
-      console.error('Failed to retrieve ', settingsKey);
-    };
+    callback(self._defaultCardIndex);
   });
 };
 
@@ -78,6 +70,12 @@ MultiSimActionButton.prototype._click = function cb_click(event) {
       self.performAction(cardIndex);
     }
   });
+};
+
+MultiSimActionButton.prototype._settingsObserver =
+  function cb_settingsObserver(cardIndex) {
+  this._defaultCardIndex = cardIndex;
+  this._updateUI(cardIndex);
 };
 
 MultiSimActionButton.prototype._updateUI = function cb_updateUI(cardIndex) {
