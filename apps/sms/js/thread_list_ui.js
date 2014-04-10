@@ -614,7 +614,6 @@ var ThreadListUI = {
     }
     this.appendThread(thread);
     this.setEmpty(false);
-    this.sticky.refresh();
   },
 
   onMessageSending: function thlui_onMessageSending(message) {
@@ -652,6 +651,8 @@ var ThreadListUI = {
       threadsContainer = threadsContainerWrapper.childNodes[1];
       // Place our new content in the DOM
       ThreadListUI.insertThreadContainer(threadsContainerWrapper, timestamp);
+      // It's the first in this container, so we update the sticky header.
+      this.sticky.refresh();
     }
 
     // Where have I to place the new thread?
