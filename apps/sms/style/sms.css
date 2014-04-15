@@ -66,12 +66,12 @@ form[role="dialog"][data-type="edit"] > menu {
 }
 
 /* Override Building Block [Lists] styles */
-[data-type="list"] {
+.list-container {
   padding: 0;
   text-align: left;
 }
 
-#threads-container[data-type="list"] .mms-icon {
+#threads-container .mms-icon {
   display: none;
   margin-left: 0.3rem;
 
@@ -79,15 +79,15 @@ form[role="dialog"][data-type="edit"] > menu {
   color: #ff6622;
 }
 
-#threads-container[data-type="list"] [data-last-message-type="mms"] .mms-icon {
+#threads-container [data-last-message-type="mms"] .mms-icon {
   display: inline;
 }
 
-#threads-container[data-type="list"] [data-last-message-type="mms"] .body-text {
+#threads-container [data-last-message-type="mms"] .body-text {
   display: none;
 }
 
-[data-type="list"] header {
+.list-container header {
   margin: 0 1.5rem;
 }
 
@@ -111,11 +111,11 @@ form[role="dialog"][data-type="edit"] > menu {
   background-position: 1.5rem 0;
 }
 
-#threads-container[data-type="list"] header {
+#threads-container header {
   background: #fff;
 }
 
-#threads-container[data-type="list"] ul {
+#threads-container ul {
   padding: 0 1.5rem;
   background-color: #fff;
 }
@@ -128,78 +128,78 @@ form[role="dialog"][data-type="edit"] > menu {
   background-color: #fff;
 }
 
-[data-type="list"] li {
+.list-container li {
   height: 6.1rem;
 }
 
-[data-type="list"] li > label {
+.list-container li > label {
   right: 5rem;
   display: block;
   overflow: hidden;
   opacity: 0;
 }
 
-[data-type="list"] aside.icon-unread {
+.list-container aside.icon-unread {
   margin: 0;
   width: 1.5rem;
 }
 
-[data-type="list"] .unread aside.icon-unread {
+.list-container .unread aside.icon-unread {
   background: url("../style/images/unread.png") no-repeat left center / 1rem;
 }
 
-[data-type="list"] .draft a * {
+.list-container .draft a * {
   pointer-events: none;
 }
 
-[data-type="list"] .draft .icon-draft {
+.list-container .draft .icon-draft {
   background: url("../style/images/draft.png") no-repeat left center / 1rem;
 }
 
-[data-type="list"] .is-draft .pack-end {
+.list-container .is-draft .pack-end {
   opacity: 0.5;
 }
 
-[data-type="list"] .is-draft .name {
+.list-container .is-draft .name {
   font-style: italic;
   color: #5f5f5f;
 }
 
 
-[data-type="list"] p time {
+.list-container p time {
   display: inline-block;
 }
 
-[data-type="list"] .unread p time {
+.list-container .unread p time {
   color: #1D8399;
 }
 
 /* Lists: edit mode */
-.edit [data-type="list"] li > label {
+.edit .list-container li > label {
   opacity: 1;
   pointer-events: auto;
   left: -1.4rem;
 }
 
-.edit [data-type="list"] li > .pack-checkbox input ~ span:after {
+.edit .list-container li > .pack-checkbox input ~ span:after {
   opacity: 1;
   transform: translateX(4.5rem);
   left: -2.2rem;
 }
 
-.edit [data-type="list"] li > a > aside.icon-unread {
+.edit .list-container li > a > aside.icon-unread {
   opacity: 0;
 }
 
-.edit [data-type="list"] li > a > p {
+.edit .list-container li > a > p {
   transform: translateX(3.5rem);
 }
 
-.edit #threads-container[data-type="list"] aside.pack-end {
+.edit #threads-container aside.pack-end {
   margin: 0 0 0 -3rem;
 }
 
-.edit #threads-container[data-type="list"] aside.pack-end span {
+.edit #threads-container aside.pack-end span {
   transform: translateX(7.5rem);
 }
 
@@ -378,16 +378,15 @@ section.has-carrier .article-list header:first-child {
   text-transform: uppercase;
 }
 
-.article-list[data-type="list"] > ul:last-child {
+.article-list > ul:last-child {
   padding-bottom: 0.5rem;
 }
 
-.article-list header,
-  .article-list[data-type="list"] .message.incoming .bubble {
+.article-list header, .article-list .message.incoming .bubble {
   padding-left: 4rem;
 }
 
-.article-list[data-type="list"] .message {
+.article-list .message {
   position: relative;
   z-index: 0; /* bug 970422 */
 
@@ -406,15 +405,15 @@ section.has-carrier .article-list header:first-child {
   display: none;
 }
 
-.article-list[data-type="list"] .message.hidden {
+.article-list .message.hidden {
   display: none;
 }
 
-.article-list[data-type="list"] header.hidden {
+.article-list header.hidden {
   display: none;
 }
 
-.article-list[data-type="list"] .message .bubble {
+.article-list .message .bubble {
   overflow: visible;
   -moz-box-sizing: border-box;
   max-width: calc(100% - 4rem);
@@ -424,24 +423,24 @@ section.has-carrier .article-list header:first-child {
   background: #fff;
 }
 
-#messages-container[data-type="list"] ul {
+#messages-container ul {
   background-color: #e4e4e4;
 }
 
-#messages-container[data-type="list"] .message.mms .bubble img {
+#messages-container .message.mms .bubble img {
   height: auto;
   width: auto;
 }
 
-.article-list[data-type="list"] .message .subject {
+.article-list .message .subject {
   display: none;
 }
 
-.article-list[data-type="list"] .has-subject .bubble {
+.article-list .has-subject .bubble {
   padding-top: 0;
 }
 
-.article-list[data-type="list"] .has-subject .subject {
+.article-list .has-subject .subject {
   display: block;
   margin-bottom: 0.5rem;
   padding-top: 0.9rem; /* 0.9 top + 1.4 line-height + 0.7 bottom = 3.0 */
@@ -453,7 +452,7 @@ section.has-carrier .article-list header:first-child {
   color: #666;
 }
 
-.article-list[data-type="list"] .has-subject.outgoing .subject {
+.article-list .has-subject.outgoing .subject {
   /* to extend the background color and bottom border */
   width: 100%;
   margin-left: -1.5rem;
@@ -465,7 +464,7 @@ section.has-carrier .article-list header:first-child {
   border-radius: 0.3rem 0 0 0;
 }
 
-.article-list[data-type="list"] .has-subject.incoming .subject {
+.article-list .has-subject.incoming .subject {
   /* to extend the background color and bottom border */
   width: 100%;
   margin-left: -4rem;
@@ -477,7 +476,7 @@ section.has-carrier .article-list header:first-child {
   border-radius: 0 0.3rem 0 0;
 }
 
-.article-list[data-type="list"] .message.outgoing .bubble {
+.article-list .message.outgoing .bubble {
   float: right;
 
   padding-right: 4.1rem;
@@ -485,7 +484,7 @@ section.has-carrier .article-list header:first-child {
   border-radius: 0.3rem 0 0 0.3rem;
 }
 
-.article-list[data-type="list"] .message.incoming .bubble {
+.article-list .message.incoming .bubble {
   float: left;
 
   border-radius: 0 0.3rem 0.3rem 0;
@@ -493,23 +492,23 @@ section.has-carrier .article-list header:first-child {
   background: #FCC987;
 }
 
-.article-list[data-type="list"] .message.sending .bubble {
+.article-list .message.sending .bubble {
   color: #5f5f5f;
 }
 
-.article-list[data-type="list"] .message.error .bubble {
+.article-list .message.error .bubble {
   border: 0.1rem solid #B90000;
 }
 
-.article-list[data-type="list"] .message.error.outgoing .bubble {
+.article-list .message.error.outgoing .bubble {
   border-right-width: 0;
 }
 
-.article-list[data-type="list"] .message .bubble > div.message-content {
+.article-list .message .bubble > div.message-content {
   position: relative;
 }
 
-.article-list[data-type="list"] .message .bubble aside {
+.article-list .message .bubble aside {
   position: absolute;
   top: -1.5rem;
   right: -4.1rem;
@@ -522,60 +521,60 @@ section.has-carrier .article-list header:first-child {
   text-align: center;
 }
 
-.article-list[data-type="list"] .message.incoming .bubble aside {
+.article-list .message.incoming .bubble aside {
   left: -4rem;
   right: auto;
   margin: 0 0.5rem 0 0;
 }
 
-.article-list[data-type="list"] .message.has-subject .bubble aside {
+.article-list .message.has-subject .bubble aside {
   top: -0.5rem;
 }
 
-.article-list[data-type="list"] .message.error .bubble aside progress,
-.article-list[data-type="list"] .message.delivered .bubble aside progress {
+.article-list .message.error .bubble aside progress,
+.article-list .message.delivered .bubble aside progress {
   display: none;
 }
 
-.article-list[data-type="list"] .message.error .bubble aside {
+.article-list .message.error .bubble aside {
   display: block;
 
   background: url('images/icons/exclamation.png') no-repeat center center;
   background-size: 2.2rem;
 }
 
-.article-list[data-type="list"] .message.delivered .bubble aside {
+.article-list .message.delivered .bubble aside {
   display: block;
   background: url('images/icons/deliveredtick.png') no-repeat center center;
   background-size: 2.2rem;
 }
 
-.article-list[data-type="list"] .message button.download {
+.article-list .message button.download {
   padding: 0.5em;
   margin: 0.5em;
   background: #ccc;
   width: 100%;
 }
 
-.article-list[data-type="list"] .message.pending .bubble aside,
-.article-list[data-type="list"] .message.sending .bubble aside {
+.article-list .message.pending .bubble aside,
+.article-list .message.sending .bubble aside {
   display: block;
 }
 
-.article-list[data-type="list"] .message.pending .bubble aside progress,
-.article-list[data-type="list"] .message.sending .bubble aside progress {
+.article-list .message.pending .bubble aside progress,
+.article-list .message.sending .bubble aside progress {
   display: block;
   height: 100%;
   margin: 0 auto;
 }
 
-.edit .article-list[data-type="list"] .message.error .bubble aside,
-.edit .article-list[data-type="list"] .message.pending .bubble aside progress,
-.edit .article-list[data-type="list"] .message.sending .bubble aside progress {
+.edit .article-list .message.error .bubble aside,
+.edit .article-list .message.pending .bubble aside progress,
+.edit .article-list .message.sending .bubble aside progress {
   display: none;
 }
 
-.article-list[data-type="list"] .message .bubble p {
+.article-list .message .bubble p {
   text-align: left;
   font-size: 1.8rem;
   line-height: 2.3rem;
@@ -583,16 +582,16 @@ section.has-carrier .article-list header:first-child {
   padding: 0;
 }
 
-.article-list[data-type="list"] .message.no-attachment .bubble p {
+.article-list .message.no-attachment .bubble p {
   height: 2.3rem;
 }
 
-.article-list[data-type="list"] .message .bubble p a {
+.article-list .message .bubble p a {
   color: #000;
   text-decoration: underline;
 }
 
-.article-list[data-type="list"] .message .bubble p a:active {
+.article-list .message .bubble p a:active {
   color: #FF4E00;
 }
 
@@ -600,11 +599,11 @@ section.has-carrier .article-list header:first-child {
   Styles for Edit mode in Messages Container
 */
 
-.edit .article-list[data-type="list"] .message {
+.edit .article-list .message {
   border-color: #e7e7e7;
 }
 
-.edit [data-type="list"] .message .bubble {
+.edit .message .bubble {
   pointer-events: none;
 }
 
@@ -970,7 +969,7 @@ generateHeightRule() (in ThreadUI/thread_ui.js) will create:
   content: "!";
 }
 
-.article-list[data-type="list"] ul.contact-list {
+.article-list ul.contact-list {
   position: absolute;
   width: calc(100% - 3.1rem);
   z-index: 5;
@@ -1040,11 +1039,11 @@ body[role="application"] form[role="dialog"][data-type="action"] > header:first-
   text-align: left;
 }
 
-section[role="region"].new .article-list[data-type="list"]  li:first-child {
+section[role="region"].new .article-list  li:first-child {
   margin-top: 4.6rem;
 }
 
-section[role="region"].new .article-list[data-type="list"]  li {
+section[role="region"].new .article-list  li {
   pointer-events: auto;
 }
 
