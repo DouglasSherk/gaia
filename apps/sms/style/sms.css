@@ -134,10 +134,6 @@ form[role="dialog"][data-type="edit"] > menu {
   background: url("../style/images/unread.png") no-repeat left center / 1rem;
 }
 
-.list-container .draft a * {
-  pointer-events: none;
-}
-
 .list-container .draft .icon-draft {
   background: url("../style/images/draft.png") no-repeat left center / 1rem;
 }
