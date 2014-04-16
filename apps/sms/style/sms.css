@@ -1032,7 +1032,7 @@ section[role="region"].new .article-list  li {
   pointer-events: auto;
 }
 
-.suggestion * {
+.suggestion .name, .suggestion .number {
   pointer-events: none;
 }
 
