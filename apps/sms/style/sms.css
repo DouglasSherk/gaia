@@ -181,10 +181,9 @@ form[role="dialog"][data-type="edit"] > menu {
   left: -1.4rem;
 }
 
-.edit .list-container li > .pack-checkbox input ~ span:after {
+.checkbox-ui:after {
   opacity: 1;
-  transform: translateX(4.5rem);
-  left: -2.2rem;
+  transform: translateX(2.3rem);
 }
 
 .edit .list-container li > a > aside.icon-unread {
