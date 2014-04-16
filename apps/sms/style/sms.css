@@ -1051,15 +1051,14 @@ section[role="region"].new .article-list  li {
 }
 
 /* Elements related to information view */
-section[role="region"].information #messages-options-icon,
-section[role="region"].information #messages-attach-button,
-section[role="region"].information #messages-subheader,
-section[role="region"].information #messages-container,
-section[role="region"].information #messages-compose-form {
+.information .view-header > menu[type="toolbar"],
+.information #messages-subheader,
+.information #messages-container,
+.information #messages-compose-form {
   display: none;
 }
 
-section[role="region"].information > header:first-child .icon.icon-back {
+.information #messages-back-button > .icon.icon-back {
   background-image: url(/shared/style/headers/images/icons/close.svg);
 }
 
