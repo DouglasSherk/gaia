@@ -1,19 +1,19 @@
 /*
- *  The code is being shared between system/emergency-call/js/keypad.js
- *  and dialer/js/keypad.js. Be sure to update both file when you commit!
- *
- */
+<!--
+ The code is being shared between system/emergency-call/js/keypad.js
+ and dialer/js/keypad.js. Be sure to update both file when you commit!
+-->
 
-.reset-button {
-  border: 0;
-  background: none;
-}
+# Container
 
-.reset-button::-moz-focus-inner {
-  border: 0;
-  outline: none;
-}
-
+```
+<div class="docs-override" id="phone-number-view-container">
+  <div class="phone-number-view-wrapper-input">
+    <input id="phone-number-view" type="text" class="phone-number-font font-light" readonly="readonly" data-l10n-id="phoneNumberInput" value="1234567890">
+  </div>
+</div>
+```
+*/
 #phone-number-view-container {
   width: 100%;
   height: 28%;
@@ -37,6 +37,7 @@
   visibility: hidden;
 }
 
+/* View for the phone number, unclickable. */
 #phone-number-view {
   font-size: 4.1rem;
   width: 100%;
@@ -58,6 +59,22 @@
   visibility: hidden;
 }
 
+#phone-number-view-container.docs-override {
+  height: 100%;
+}
+
+/*
+# Keypad decorations
+
+## Delete button
+
+```
+<div class="docs-override" id="phone-number-view-container">
+  <button id="keypad-delete" class="reset-button" data-value="delete" data-l10n-id="keypadDelete">
+  </button>
+</div>
+```
+*/
 #keypad-delete {
   margin-bottom: 4.5rem;
   padding: 0 2.5rem 0 0;
@@ -78,6 +95,64 @@
   opacity: 0.6;
 }
 
+.reset-button {
+  border: 0;
+  background: none;
+}
+
+.reset-button::-moz-focus-inner {
+  border: 0;
+  outline: none;
+}
+
+.docs-override #keypad-delete {
+  visibility: initial;
+}
+
+/*
+# Keypad
+*/
+
+/*
+## Rows and keys
+
+```
+<div class="docs-override" id="phone-number-view-container">
+  <article id="keyboard-container">
+    <section id="keypad">
+      <div class="keypad-row">
+        <div class="keypad-key" role="key" data-value="1" data-voicemail="true">
+          <span>1</span>
+          <em class="keypad-subicon voicemail" data-l10n-id="voiceMailKey"></em>
+        </div>
+        <div class="keypad-key" role="key" data-value="2">
+          <span>2</span>
+          <em>ABC</em>
+        </div>
+        <div class="keypad-key" role="key" data-value="3">
+          <span>3</span>
+          <em>DEF</em>
+        </div>
+      </div>
+      <div class="keypad-row">
+        <div class="keypad-key" role="key" data-value="4">
+          <span>4</span>
+          <em>GHI</em>
+        </div>
+      </div>
+    </section>
+    <section id="keypad-callbar">
+      <button id="keypad-callbar-add-contact" data-value="add-contact" class="button keypad-callbar-button icon-add-contact" disabled>
+        Add Contact
+      </button>
+      <button id="keypad-callbar-call-action" class="button" data-value="make-call">
+        Call Number
+      </button>
+    </section>
+  </article>
+</div>
+```
+*/
 #keyboard-container {
   height: 72%;
   padding: 0 1rem;
@@ -185,6 +260,10 @@
   -moz-box-sizing: border-box;
 }
 
+.docs-override #keyboard-container {
+  height: 100%;
+}
+
 .keypad-callbar-button {
   position: relative;
   width: 9rem;
@@ -240,7 +319,7 @@
   background-size: 4rem 8rem;
 }
 
-/* we won't do anything on click but this prevents fluffing/rendering issues */
+/* <!-- we won't do anything on click but this prevents fluffing/rendering issues --> */
 .icon-add-contact:disabled {
   pointer-events: all;
 }
@@ -252,6 +331,18 @@
 .icon-add-contact:not(:disabled):active::before {
   background-position: center -4rem;
 }
+
+/*
+# SIM Indication
+
+```
+<div class="docs-override has-preferred-sim">
+  <button id="keypad-callbar-call-action">
+    <span class="js-sim-indication">SIM 1</span>
+  </button>
+</div>
+```
+*/
 
 .js-sim-indication {
   display: none;
@@ -276,6 +367,27 @@
   background-repeat: no-repeat;
   background-size: 1.4rem 1rem;
 }
+
+/*
+# Keypad hidebar
+
+```
+<section id="keypad-hidebar">
+  <div id="keypad-hidebar-hang-up-action-wrapper">
+    <span role="button" id="keypad-hidebar-hang-up-action" class="keypad-hidebar-button">
+      <div>
+      </div>
+    </span>
+  </div>
+  <div id="keypad-hidebar-hide-keypad-action-wrapper">
+    <span role="button" id="keypad-hidebar-hide-keypad-action" class="keypad-hidebar-button">
+      <div>
+      </div>
+    </span>
+  </div>
+</section>
+```
+*/
 
 #keypad-hidebar {
   border: 0;
@@ -345,6 +457,10 @@
 #keypad-hidebar-hide-keypad-action:active > div {
  background-image: url('keypad/images/actionicon_activecall_dismisskeyboard_hitstate.png');
 }
+
+/*
+# Misc
+*/
 
 .phone-number-font {
   color: #fff;
