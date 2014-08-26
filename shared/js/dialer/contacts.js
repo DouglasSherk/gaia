@@ -208,5 +208,35 @@ var Contacts = {
 
       self._findContacts(options, callback);
     });
+  },
+
+  getLength: function getLength(prop) {
+    if (!prop || !prop.length) {
+      return 0;
+    }
+    return prop.length;
+  },
+
+  sendEmailOrPick: function sendEmailOrPick(address) {
+    try {
+      // We don't check the email format, lets the email
+      // app do that
+      new MozActivity({
+        name: 'new',
+        data: {
+          type: 'mail',
+          URI: 'mailto:' + address
+        }
+      });
+    } catch (e) {
+      console.error('WebActivities unavailable? : ' + e);
+    }
+  },
+
+  sendSms: function sendSms(number) {
+    if (!ActivityHandler.currentlyHandling ||
+        ActivityHandler.currentActivityIs(['open'])) {
+      SmsIntegration.sendSms(number);
+    }
   }
 };
