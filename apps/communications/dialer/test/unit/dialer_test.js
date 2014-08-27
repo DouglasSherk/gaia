@@ -32,6 +32,7 @@ require('/shared/test/unit/mocks/dialer/mock_lazy_l10n.js');
 require('/shared/test/unit/mocks/dialer/mock_keypad.js');
 require('/shared/test/unit/mocks/dialer/mock_tone_player.js');
 require('/shared/test/unit/mocks/dialer/mock_utils.js');
+require('/shared/test/unit/mocks/contacts/mock_contacts_buttons.js');
 
 require('/dialer/js/dialer.js');
 
@@ -53,7 +54,8 @@ var mocksHelperForDialer = new MocksHelper([
   'SuggestionBar',
   'Utils',
   'TonePlayer',
-  'Voicemail'
+  'Voicemail',
+  'ContactsButtons'
 ]).init();
 
 suite('navigation bar', function() {

@@ -3,7 +3,8 @@
 /* global AccessibilityHelper, CallLog, CallLogDBManager, Contacts,
           KeypadManager,LazyL10n, LazyLoader, MmiManager, Notification,
           NotificationHelper, SettingsListener, SimPicker, SimSettingsHelper,
-          SuggestionBar, TelephonyHelper, TonePlayer, Utils, Voicemail */
+          SuggestionBar, TelephonyHelper, TonePlayer, Utils, Voicemail,
+          ContactsButtons */
 
 var NavbarManager = {
   init: function nm_init() {
@@ -18,6 +19,27 @@ var NavbarManager = {
 
     var contacts = document.getElementById('option-contacts');
     contacts.addEventListener('click', this.contactsTabTap);
+
+    var phoneDetailsElt = document.getElementById('phone-details');
+    var emailDetailsElt = document.getElementById('email-details');
+    LazyLoader.load([phoneDetailsElt,
+                     emailDetailsElt,
+                     '/shared/js/dialer/contacts.js',
+                     '/shared/js/dialer/utils.js',
+                     '/shared/js/contacts/contacts_buttons.js',
+                     '/shared/js/contacts/utilities/templates.js',
+                     '/shared/js/contacts/sms_integration.js',
+                     '/shared/js/text_normalizer.js',
+                     '/dialer/js/telephony_helper.js'], function() {
+      Contacts.findByNumber('02657360277',
+      function lookup(contact, matchingTel) {
+        var listContainer = document.getElementById('list-details');
+        var contactDetails = document.getElementById('contact-detail');
+        ContactsButtons.init(listContainer, contactDetails);
+        ContactsButtons.renderPhones(contact);
+        ContactsButtons.renderEmails(contact);
+      });
+    });
   },
   resourcesLoaded: false,
   /*
